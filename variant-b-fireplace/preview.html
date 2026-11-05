@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fireplace preview</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #282828; overflow: hidden; font: 13px/1.4 system-ui, sans-serif; color: #cfcfcf; }
+    /* the 1680x975 composition, scaled down to fit the window (never up) */
+    #stage { position: absolute; left: 0; top: 0; width: 1680px; height: 975px; transform-origin: 0 0; }
+    iframe { position: absolute; border: 0; display: block; background: #1f2a1c; }
+    #left  { left: 0;    top: 0; width: 320px;  height: 975px; }
+    #top   { left: 324px; top: 0; width: 1032px; height: 250px; }
+    #right { left: 1360px; top: 0; width: 320px; height: 975px; }
+    /* the publisher's website: deliberately empty and calm, as in design/layout.png */
+    #site { position: absolute; left: 324px; top: 254px; width: 1032px; height: 721px; background: #282828; }
+    #bar { position: fixed; right: 14px; bottom: 12px; display: flex; gap: 8px; align-items: center; z-index: 5;
+      background: rgba(0,0,0,.55); padding: 6px 10px; border-radius: 8px; }
+    #bar button { font: inherit; color: #fff; background: #3b3b3b; border: 1px solid #5a5a5a; border-radius: 5px; padding: 4px 10px; cursor: pointer; }
+    #bar button:hover { background: #4a4a4a; }
+    #bar label { cursor: pointer; user-select: none; }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <iframe id="left"  title="Fireplace left"></iframe>
+    <iframe id="top"   title="Fireplace top"></iframe>
+    <iframe id="right" title="Fireplace right"></iframe>
+    <div id="site"></div>
+  </div>
+  <div id="bar">
+    <button id="replay" type="button" title="R">&#8635; Replay</button>
+    <label><input id="dbg" type="checkbox"> Design overlay 50% (D)</label>
+  </div>
+
+  <script>
+    (function () {
+      var qs = new URLSearchParams(location.search);
+      var frames = { left: document.getElementById('left'), top: document.getElementById('top'), right: document.getElementById('right') };
+      var dbgBox = document.getElementById('dbg');
+      var ready = {};
+
+      // The parts are separate documents. They announce "ready" once their images are decoded and the
+      // preview then tells all three the same absolute start time, so the intro is one choreography.
+      Object.keys(frames).forEach(function (p) {
+        frames[p].src = p + '.html?sync=1' + (qs.get('debug') === '1' ? '&debug=1' : '');
+      });
+      dbgBox.checked = qs.get('debug') === '1';
+
+      window.addEventListener('message', function (e) {
+        var d = e.data;
+        if (d && d.fp === 'ready') {
+          ready[d.part] = true;
+          if (ready.left && ready.top && ready.right) send('start');
+        }
+      });
+
+      function send(type, extra) {
+        var at = Date.now() + 250;
+        Object.keys(frames).forEach(function (p) {
+          var m = { fp: type, at: at };
+          for (var k in extra) m[k] = extra[k];
+          frames[p].contentWindow.postMessage(m, '*');
+        });
+      }
+      function setDebug(on) { dbgBox.checked = on; Object.keys(frames).forEach(function (p) { frames[p].contentWindow.postMessage({ fp: 'debug', on: on }, '*'); }); }
+
+      document.getElementById('replay').addEventListener('click', function () { send('restart'); });
+      dbgBox.addEventListener('change', function () { setDebug(dbgBox.checked); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'r' || e.key === 'R') send('restart');
+        if (e.key === 'd' || e.key === 'D') setDebug(!dbgBox.checked);
+      });
+
+      function fit() {
+        var s = Math.min(1, window.innerWidth / 1680, window.innerHeight / 975);
+        document.getElementById('stage').style.transform = 'scale(' + s + ')';
+      }
+      window.addEventListener('resize', fit); fit();
+    })();
+  </script>
+</body>
+</html>

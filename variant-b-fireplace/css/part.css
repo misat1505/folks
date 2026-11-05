@@ -1,0 +1,34 @@
+/* Fireplace - shared by top.html, left.html and right.html.
+ * All assets are 2x exports shown at 50%. Element boxes come from css/positions.css (generated). */
+html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+body { -webkit-tap-highlight-color: transparent; }
+img { display: block; -webkit-user-drag: none; user-select: none; pointer-events: none; }
+
+.part { position: relative; overflow: hidden; cursor: pointer; background: #1f2a1c; outline-offset: -3px; }
+.part.left, .part.right { width: 320px; height: 975px; }
+.part.top { width: 1032px; height: 250px; }
+
+/* everything that moves gets its own compositor layer; only transform + opacity are animated */
+.bg { position: absolute; inset: 0; will-change: transform; transform-origin: 50% 50%; }
+.left .bg { transform-origin: 100% 40%; }     /* zoom is anchored at the edge that faces the website/seam */
+.right .bg { transform-origin: 0% 40%; }
+.bg img { width: 100%; height: 100%; }
+
+.logo, .panel, .copy, .cta, .line { position: absolute; }
+.logo, .copy, .cta, .panel, .line img { will-change: transform, opacity; }
+.panel img, .logo img { width: 100%; height: 100%; }
+.line { overflow: hidden; }                    /* masks the line while it rises into place */
+.line img { width: 100%; height: 100%; }
+
+/* the CTA is centred in the lower part of the text panel (measured: x 73.75 / y 837.5 css px) */
+.cta { left: 74px; top: 837px; }
+
+.veil { position: absolute; inset: 0; background: #0d160b; pointer-events: none; }
+
+/* debug overlay: design/layout.png at 50% on top of the build (?debug=1 or the preview toggle).
+ * layout.png is a 0.975x screenshot, so it is blown up by 1/0.975; offsets are each frame's origin in it. */
+.dbg { position: absolute; inset: 0; z-index: 99; pointer-events: none; opacity: .5;
+  background: url(../dev/layout.jpg) no-repeat; background-size: 1727.2px 1044.1px; }
+.left .dbg  { background-position: -28.7px -51.3px; }
+.top .dbg   { background-position: -352.8px -51.3px; }
+.right .dbg { background-position: -1384.6px -50.3px; }
