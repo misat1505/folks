@@ -97,8 +97,15 @@ pa = alpha_of("player")
 pm = ndi.binary_erosion(np.pad(pa > 110, PLAYER_ERODE + 1), structure=disk(PLAYER_ERODE))[PLAYER_ERODE + 1:-(PLAYER_ERODE + 1), PLAYER_ERODE + 1:-(PLAYER_ERODE + 1)]
 edge = pm & ~ndi.binary_erosion(pm)
 ys, xs = np.where(edge)
-# keep one point every ~3px along the outline (plenty: obstacles are >= 37px wide)
-pts = sorted({(int(x // 3 * 3), int(y // 3 * 3)) for x, y in zip(xs, ys)})
+# sample points of the eroded player mask: the outline every ~3px plus a filled 4px grid,
+# so even a small bacterium that would end up *inside* the player is detected
+pts = {(int(x // 3 * 3), int(y // 3 * 3)) for x, y in zip(xs, ys) if pm[int(y // 3 * 3), int(x // 3 * 3)] or True}
+pts = {p for p in pts if 0 <= p[0] < pm.shape[1] and 0 <= p[1] < pm.shape[0] and pm[p[1], p[0]]}
+for y in range(0, pm.shape[0], 4):
+    for x in range(0, pm.shape[1], 4):
+        if pm[y, x]:
+            pts.add((x, y))
+pts = sorted(pts)
 data["player"] = {"w": int(pa.shape[1]), "h": int(pa.shape[0]), "pts": [list(p) for p in pts]}
 
 # top / bottom gut walls (border.png): per column, how far the opaque cloud reaches

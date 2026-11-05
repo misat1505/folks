@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="ad.size" content="width=360,height=640">
+  <title>Gut Run</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- #viewport = the real visible area of the phone, #stage = the 360x640 design, scaled to fit by js/game.js -->
+  <div id="viewport">
+    <div id="stage" aria-label="Gut Run">
+      <canvas id="game" width="720" height="1280"></canvas>
+
+      <!-- start screen: headline + tutorial hand ("tab to run") -->
+      <div id="start" class="screen">
+        <img class="layer" id="headline" src="assets/tut.png" alt="Bringe Poo durch den Darm ans Ziel.">
+        <img id="gesture" src="assets/gesture.png" alt="Tab to run">
+      </div>
+
+      <!-- fail endcard (layers are full-frame 720x1280 PNGs shown at 360x640) -->
+      <div id="fail" class="screen endcard" hidden>
+        <img class="layer" data-k="bubble" src="assets/fail/bubble.png" alt="">
+        <img class="layer" data-k="bac1" src="assets/fail/bac1.png" alt="">
+        <img class="layer" data-k="bac2" src="assets/fail/bac2.png" alt="">
+        <img class="layer" data-k="bac3" src="assets/fail/bac3.png" alt="">
+        <img class="layer" data-k="bac4" src="assets/fail/bac4.png" alt="">
+        <img class="layer" data-k="bac5" src="assets/fail/bac5.png" alt="">
+        <img class="layer" data-k="sad" src="assets/fail/sad.png" alt="Trauriger Poo">
+        <img class="layer" data-k="hl" src="assets/fail/hl.png" alt="Poo, das tat weh! Erfahre jetzt, was deinem Darm guttut.">
+        <button class="btn" id="fail-cta" data-k="cta" type="button"><img src="assets/fail/cta.png" alt="Jetzt informieren!"></button>
+        <button class="btn" id="replay" data-k="replay" type="button"><img src="assets/fail/replay.png" alt="Nochmal spielen"></button>
+      </div>
+
+      <!-- win endcard -->
+      <div id="win" class="screen endcard" hidden>
+        <img class="layer" data-k="bubble" src="assets/win/bubble.png" alt="">
+        <img class="layer" data-k="konfetti" src="assets/win/konfetti.png" alt="">
+        <img class="layer" data-k="happy" src="assets/win/happy.png" alt="Glücklicher Poo">
+        <img class="layer" data-k="hl" src="assets/win/hl.png" alt="Poo, tut das gut! Wenn du weißt, was dein Darm braucht.">
+        <button class="btn" id="win-cta" data-k="cta" type="button"><img src="assets/win/cta.png" alt="Jetzt mehr erfahren"></button>
+      </div>
+
+      <img class="layer" id="logo" src="assets/logo.png" alt="Logo">
+
+      <button id="mute" type="button" aria-label="Ton ausschalten" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M3 9v6h4l5 4V5L7 9H3z" fill="currentColor"/>
+          <path class="waves" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path class="slash" d="M16 9l6 6M22 9l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script src="js/gsap.min.js"></script>
+  <script src="js/hitmasks.js"></script>
+  <script src="js/level.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
